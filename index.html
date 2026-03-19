@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>brag.fast — v1.2.0 Released</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FAF6EF;
+      --orange: #F26522;
+      --orange-light: #FF8C4B;
+      --orange-dim: #F2652220;
+      --ink: #1A1208;
+      --muted: #7A6A55;
+      --border: #E8DFD0;
+      --tag-bg: #FFF0E5;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Geist', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.5;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      background: var(--cream);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--orange);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Instrument Serif', serif;
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .logo-text {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+    }
+
+    .header-tag {
+      margin-left: auto;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--orange);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 32px 120px;
+    }
+
+    .release-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .version-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+    }
+
+    .release-date {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stable-tag {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border: 1px solid #C8E6C9;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(32px, 5vw, 46px);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+
+    h1 em {
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    .release-summary {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 48px;
+      max-width: 580px;
+      border-left: 2px solid var(--orange);
+      padding-left: 16px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .changelog-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .changelog-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      align-items: flex-start;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .changelog-item:hover {
+      border-color: var(--orange-light);
+      box-shadow: 0 2px 12px var(--orange-dim);
+    }
+
+    .item-type {
+      min-width: 56px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 1px;
+    }
+
+    .item-type.feat    { background: #FFF0E5; color: var(--orange); border: 1px solid #FFD5B8; }
+    .item-type.fix     { background: #FFF3F3; color: #D32F2F; border: 1px solid #FFCDD2; }
+    .item-type.perf    { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+    .item-type.chore   { background: #F3F3F3; color: #555; border: 1px solid #DDD; }
+    .item-type.refactor { background: #EDE7F6; color: #512DA8; border: 1px solid #D1C4E9; }
+
+    .item-content {
+      flex: 1;
+    }
+
+    .item-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 2px;
+    }
+
+    .item-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .item-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .commit-hash {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--orange);
+      background: var(--tag-bg);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .commit-hash:hover {
+      background: var(--orange);
+      color: white;
+      border-color: var(--orange);
+    }
+
+    .item-author {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .screenshot-block {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      margin-bottom: 40px;
+    }
+
+    .screenshot-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #FF5F57; }
+    .dot-yellow { background: #FEBC2E; }
+    .dot-green { background: #28C840; }
+
+    .screenshot-url {
+      margin-left: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .screenshot-body {
+      padding: 0;
+      background: #0F0F0F;
+      position: relative;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Fake landing page preview inside the browser */
+    .fake-landing {
+      width: 100%;
+      padding: 40px 48px;
+      background: linear-gradient(135deg, #0F0F0F 0%, #1A1208 100%);
+      position: relative;
+    }
+
+    .fake-landing::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(242,101,34,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .fake-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+
+    .fake-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 16px;
+      color: white;
+    }
+
+    .fake-nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .fake-nav-link {
+      width: 40px;
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+
+    .fake-cta-pill {
+      width: 60px;
+      height: 26px;
+      background: var(--orange);
+      border-radius: 100px;
+    }
+
+    .fake-hero {
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .fake-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(242,101,34,0.15);
+      border: 1px solid rgba(242,101,34,0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .fake-eyebrow-dot {
+      width: 5px; height: 5px;
+      background: var(--orange);
+      border-radius: 50%;
+    }
+
+    .fake-eyebrow-line {
+      width: 80px; height: 7px;
+      background: rgba(242,101,34,0.5);
+      border-radius: 4px;
+    }
+
+    .fake-headline {
+      font-family: 'Instrument Serif', serif;
+      color: white;
+      font-size: 28px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .fake-headline span {
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    .fake-sub {
+      width: 60%;
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      margin: 0 auto 6px;
+    }
+
+    .fake-sub-2 {
+      width: 45%;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin: 0 auto 24px;
+    }
+
+    .fake-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .fake-btn-primary {
+      background: var(--orange);
+      height: 34px;
+      width: 120px;
+      border-radius: 100px;
+    }
+
+    .fake-btn-secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      height: 34px;
+      width: 100px;
+      border-radius: 100px;
+    }
+
+    .screenshot-caption {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .contributors-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .avatar-stack {
+      display: flex;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--cream);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .avatar:first-child { margin-left: 0; }
+
+    .contributors-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .contributors-text strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .footer-actions {
+      margin-top: 48px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--orange-light);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    main > * {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    main > *:nth-child(2) { animation-delay: 0.05s; }
+    main > *:nth-child(3) { animation-delay: 0.1s; }
+    main > *:nth-child(4) { animation-delay: 0.15s; }
+    main > *:nth-child(5) { animation-delay: 0.2s; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <div class="logo-mark">b</div>
+    <span class="logo-text">brag.fast</span>
+  </a>
+  <span class="header-tag">changelog</span>
+</header>
+
+<main>
+
+  <div class="release-meta">
+    <span class="version-badge">v1.2.0</span>
+    <span class="release-date">March 18, 2025</span>
+    <span class="stable-tag">Latest stable</span>
+  </div>
+
+  <h1>New landing page,<br /><em>faster image gen</em> &amp; fixes</h1>
+
+  <p class="release-summary">
+    This release ships the redesigned brag.fast marketing site, cuts image generation time by 40%, 
+    and cleans up a handful of bugs around webhook delivery and font rendering that have been 
+    sitting in the backlog too long.
+  </p>
+
+  <!-- Browser preview of the new landing page -->
+  <div class="screenshot-block">
+    <div class="screenshot-header">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+      <span class="screenshot-url">brag.fast</span>
+    </div>
+    <div class="screenshot-body">
+      <div class="fake-landing">
+        <div class="fake-nav">
+          <span class="fake-logo">brag.fast</span>
+          <div class="fake-nav-links">
+            <div class="fake-nav-link"></div>
+            <div class="fake-nav-link"></div>
+            <div class="fake-nav-link"></div>
+          </div>
+          <div class="fake-cta-pill"></div>
+        </div>
+        <div class="fake-hero">
+          <div class="fake-eyebrow">
+            <div class="fake-eyebrow-dot"></div>
+            <div class="fake-eyebrow-line"></div>
+          </div>
+          <div class="fake-headline">Ship a release.<br /><span>Brag about it instantly.</span></div>
+          <div class="fake-sub"></div>
+          <div class="fake-sub-2"></div>
+          <div class="fake-buttons">
+            <div class="fake-btn-primary"></div>
+            <div class="fake-btn-secondary"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screenshot-caption">↑ New landing page — dark theme, Instrument Serif hero, cream/orange palette</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number">40%</div>
+      <div class="stat-label">faster image gen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">8</div>
+      <div class="stat-label">commits merged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">3</div>
+      <div class="stat-label">bugs squashed</div>
+    </div>
+  </div>
+
+  <!-- New features -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-icon">✦</span>
+      <span class="section-title">What's new</span>
+      <div class="section-line"></div>
+    </div>
+    <ul class="changelog-list">
+
+      <li class="changelog-item">
+        <span class="item-type feat">feat</span>
+        <div class="item-content">
+          <div class="item-title">Redesigned marketing landing page</div>
+          <div class="item-desc">New dark hero, Instrument Serif headline, and a "brag fast = breakfast" lede. Added live image preview, pricing section, and FAQ. Replaced the old placeholder with a proper conversion-optimised layout.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">a3f9c12</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="changelog-item">
+        <span class="item-type feat">feat</span>
+        <div class="item-content">
+          <div class="item-title">GitHub App webhook now supports pre-release tags</div>
+          <div class="item-desc">The brag.fast cook integration now triggers on pre-release events (alpha, beta, rc) in addition to full releases, so you can generate announcement images earlier in the cycle.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">b71da03</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="changelog-item">
+        <span class="item-type perf">perf</span>
+        <div class="item-content">
+          <div class="item-title">Satori render pipeline optimisation — 40% faster generation</div>
+          <div class="item-desc">Moved font loading out of the per-request cycle into a warm module-level cache. Combined with lazy Sharp initialisation, cold-start image gen dropped from ~1.4s to ~0.85s on Vercel Edge.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">e22bb8f</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- Bug fixes -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-icon">⬡</span>
+      <span class="section-title">Bug fixes</span>
+      <div class="section-line"></div>
+    </div>
+    <ul class="changelog-list">
+
+      <li class="changelog-item">
+        <span class="item-type fix">fix</span>
+        <div class="item-content">
+          <div class="item-title">Webhook retry loop on Cloudflare R2 upload timeout</div>
+          <div class="item-desc">R2 uploads that timed out after 10s were incorrectly returning a 200 to GitHub, causing the webhook to mark success while the image was never stored. Now correctly surfaces a 500 so GitHub retries.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">c90ef44</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="changelog-item">
+        <span class="item-type fix">fix</span>
+        <div class="item-content">
+          <div class="item-title">Custom font not rendering in OG images for free-tier users</div>
+          <div class="item-desc">Font fallback logic was skipping the user's uploaded font when credit balance was below 5, silently falling back to Inter. Fixed the guard condition — font selection now runs independently of credit checks.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">f44ac1e</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="changelog-item">
+        <span class="item-type fix">fix</span>
+        <div class="item-content">
+          <div class="item-title">Stripe webhook signature mismatch after plan upgrade</div>
+          <div class="item-desc">Users who upgraded mid-billing-period triggered a signature validation error because the webhook secret wasn't being rotated on plan change. Secret is now fetched fresh per event rather than cached on session start.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">9d31b77</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- Chores -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-icon">◈</span>
+      <span class="section-title">Maintenance</span>
+      <div class="section-line"></div>
+    </div>
+    <ul class="changelog-list">
+
+      <li class="changelog-item">
+        <span class="item-type refactor">refactor</span>
+        <div class="item-content">
+          <div class="item-title">Split image generation route into edge + server functions</div>
+          <div class="item-desc">Moved the Satori render step to an Edge Function and Sharp post-processing to a Node.js Serverless Function. Cleaner boundary, easier to test independently.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">7f02d5a</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="changelog-item">
+        <span class="item-type chore">chore</span>
+        <div class="item-content">
+          <div class="item-title">Bump Convex to 1.17, update Better Auth to 0.9.1</div>
+          <div class="item-desc">Routine dependency updates. No breaking changes. Convex 1.17 includes improved TypeScript inference for validators.</div>
+          <div class="item-meta">
+            <a href="#" class="commit-hash">2c18e9b</a>
+            <span class="item-author">@robeverblaze</span>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- Contributors -->
+  <div class="contributors-section">
+    <div class="avatar-stack">
+      <div class="avatar" style="background: #F26522;">R</div>
+    </div>
+    <div class="contributors-text">
+      <strong>1 contributor</strong> — 8 commits, 3 files changed in landing page alone.
+      Full diff available on GitHub.
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <a href="https://github.com" class="btn btn-primary">View on GitHub →</a>
+    <a href="#" class="btn btn-secondary">← Previous release</a>
+    <a href="https://brag.fast" class="btn btn-secondary">brag.fast ↗</a>
+  </div>
+
+</main>
+
+</body>
+</html>
